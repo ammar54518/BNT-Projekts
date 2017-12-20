@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferStrategy;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
@@ -17,86 +18,47 @@ import javax.swing.JLabel;
  * @author ammar
  */
 public class Frame extends JFrame{
-    private Screen screen;
+
     
-    float player_posx = 300;
-    float player_posy = 300;
-    private int player_size = 50;
     
-    private boolean key_up = false;
-    private boolean key_down = false;
-    private boolean key_left = false;
-    private boolean key_right = false;
+    final Player player;
+    final Background bg; // background gb was initialized
     
-    public Frame(){
+    
+   
+    private BufferStrategy strat; // BufferStrategy Strat was set as an attribute
+    
+    public Frame(Player player, Background bg){ // value of background was used
         super("MoveTest");
-        screen = new Screen();
-        screen.setBounds(0, 0, 800, 600);
-        add(screen);
-        addKeyListener(new KeyHandler());
-        
-    
+        addKeyListener(new Keyboard());
+        this.player = player;
+        this.bg = bg; // bg was initialized
     }
     
-    public boolean getUp(){
-        return key_up;
-    }
-    public boolean getDown(){
-        return key_down;
-    }
-    public boolean getLeft(){
-        return key_left;
-    }
-    public boolean getRight(){
-        return key_right;
+    public void makeStrat(){ // sets makeStrar as a method whiich does everthing bellow
+        createBufferStrategy(2); // creates 2 createBufferStrategys
+        strat = getBufferStrategy(); // the variable strat was initialized as getBufferStrategy()
     }
     
+   
     
     
     public void repaintScreen(){
-        screen.repaint();
+        Graphics g = strat.getDrawGraphics(); // get strat and draw it 
+        draw(g); // zeichne g
+        g.dispose(); // deletes graphics objekts
+        strat.show(); // checks if everything is working
     }
     
-    
-    private class Screen extends JLabel{
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g); 
-            g.setColor(Color.GREEN);
-            g.fillRect((int)player_posx,(int)player_posy,player_size,player_size);
-           
-        }
-        
-        
-        
-    }
-    
-    private class KeyHandler implements KeyListener{
-
-        
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if(e.getKeyCode() == KeyEvent.VK_S)key_down = true;
-            if(e.getKeyCode() == KeyEvent.VK_W)key_up = true;
-            if(e.getKeyCode() == KeyEvent.VK_D)key_right = true;
-            if(e.getKeyCode() == KeyEvent.VK_A)key_left = true;
+    private void draw(Graphics g) {
+         g.setColor(Color.GREEN);
             
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            if(e.getKeyCode() == KeyEvent.VK_S)key_down = false;
-            if(e.getKeyCode() == KeyEvent.VK_W)key_up = false;
-            if(e.getKeyCode() == KeyEvent.VK_D)key_right = false;
-            if(e.getKeyCode() == KeyEvent.VK_A)key_left = false;
-           
-        }
-        // Unnötig
-        @Override
-        public void keyTyped(KeyEvent arg0) {}
-        
+         g.drawImage(bg.getLook() , bg.getX() , 0, null); // gives the programm the picture and size of the picture to draw it
+         g.drawImage(bg.getLook(), bg.getX()+bg.getLook().getWidth(), 0, null);
+         g.drawImage(player.getLook(), player.getBounding().x, player.getBounding().y, null); // sets the boundaries of the player in scale of the picture
     }
     
+
 }
+
+  
